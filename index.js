@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -27,15 +27,38 @@ async function run() {
     await client.connect();
     const taskCollection = client.db('taskHive').collection('task')
    
+    // add task
     app.post('/task', async(req, res) => {
       const newTask = req.body;
       const result = await taskCollection.insertOne(newTask);
       res.send(result);
     })
 
+    // all task
+    app.get('/task', async(req, res) => {
+      const result = await taskCollection.find().toArray();
+      res.send(result)
+    })
 
-
-
+    // 
+    app.get('/task/:email', async(req, res) => {
+      const email = req.params.email;
+      console.log(email)
+      const query = { userEmail: email};
+      const result = await taskCollection.find(query).toArray();
+      res.send(result);
+    })
+    
+    app.patch('/task/:id', async (req, res) => {
+      const { id } = req.params;
+      const { category } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { category },
+      };
+      const result = await taskCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
