@@ -48,7 +48,7 @@ async function run() {
       const result = await taskCollection.find(query).toArray();
       res.send(result);
     })
-    
+
     app.patch('/task/:id', async (req, res) => {
       const { id } = req.params;
       const { category } = req.body;
@@ -59,6 +59,8 @@ async function run() {
       const result = await taskCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
+
+    
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
