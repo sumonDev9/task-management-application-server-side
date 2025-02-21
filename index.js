@@ -43,7 +43,7 @@ async function run() {
     // 
     app.get('/tasks/:email', async(req, res) => {
       const email = req.params.email;
-      console.log(email)
+      // console.log(email)
       const query = { userEmail: email};
       const result = await taskCollection.find(query).toArray();
       res.send(result);
@@ -60,20 +60,29 @@ async function run() {
       res.send(result);
     });
 
+    app.put('/tasks/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true};
+      const updatedTasks = req.body;
+      const tasks = {
+        $set: {
+          title: updatedTasks.title,
+          description: updatedTasks.description,
+          category: updatedTasks.category
+        }
+      }
+      const result = await taskCollection.updateOne(filter, tasks, options);
+      res.send(result);
+    })
+
     // task
     app.delete('/tasks/:id', async(req, res) => {
       const id = req.params.id;
       const qurey = {_id: new ObjectId(id)}
-      const result =- await taskCollection.deleteOne(qurey);
+      const result = await taskCollection.deleteOne(qurey);
       res.send(result);
     })
-
-    // app.delete('/services/:id',  verifyToken, async(req, res) => {
-    //   const id = req.params.id;
-    //   const query = {_id: new ObjectId(id)}
-    //   const result = await serviceCollection.deleteOne(query);
-    //   res.send(result);
-    // })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
