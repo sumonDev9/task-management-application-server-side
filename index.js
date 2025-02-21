@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.qqfyy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-console.log(uri)
+
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -28,20 +28,20 @@ async function run() {
     const taskCollection = client.db('taskHive').collection('task')
    
     // add task
-    app.post('/task', async(req, res) => {
+    app.post('/tasks', async(req, res) => {
       const newTask = req.body;
       const result = await taskCollection.insertOne(newTask);
       res.send(result);
     })
 
     // all task
-    app.get('/task', async(req, res) => {
+    app.get('/tasks', async(req, res) => {
       const result = await taskCollection.find().toArray();
       res.send(result)
     })
 
     // 
-    app.get('/task/:email', async(req, res) => {
+    app.get('/tasks/:email', async(req, res) => {
       const email = req.params.email;
       console.log(email)
       const query = { userEmail: email};
@@ -49,7 +49,7 @@ async function run() {
       res.send(result);
     })
 
-    app.patch('/task/:id', async (req, res) => {
+    app.patch('/tasks/:id', async (req, res) => {
       const { id } = req.params;
       const { category } = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -60,7 +60,20 @@ async function run() {
       res.send(result);
     });
 
-    
+    // task
+    app.delete('/tasks/:id', async(req, res) => {
+      const id = req.params.id;
+      const qurey = {_id: new ObjectId(id)}
+      const result =- await taskCollection.deleteOne(qurey);
+      res.send(result);
+    })
+
+    // app.delete('/services/:id',  verifyToken, async(req, res) => {
+    //   const id = req.params.id;
+    //   const query = {_id: new ObjectId(id)}
+    //   const result = await serviceCollection.deleteOne(query);
+    //   res.send(result);
+    // })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
