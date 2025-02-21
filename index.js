@@ -25,8 +25,13 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-
-
+    const taskCollection = client.db('taskHive').collection('task')
+   
+    app.post('/task', async(req, res) => {
+      const newTask = req.body;
+      const result = await taskCollection.insertOne(newTask);
+      res.send(result);
+    })
 
 
 
